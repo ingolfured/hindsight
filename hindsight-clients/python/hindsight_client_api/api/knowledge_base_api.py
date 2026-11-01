@@ -16,7 +16,7 @@ from pydantic import validate_call, Field, StrictFloat, StrictStr, StrictInt
 from typing import Any, Dict, List, Optional, Tuple, Union
 from typing_extensions import Annotated
 
-from pydantic import Field, StrictStr, field_validator
+from pydantic import Field, StrictBool, StrictStr, field_validator
 from typing import Any, List, Optional
 from typing_extensions import Annotated
 from hindsight_client_api.models.create_folder_request import CreateFolderRequest
@@ -1240,6 +1240,7 @@ class KnowledgeBaseApi:
         tags: Annotated[Optional[List[StrictStr]], Field(description="Only return pages carrying these tags (matched per `tags_match`, like recall).")] = None,
         tags_match: Annotated[Optional[StrictStr], Field(description="How `tags` match a page's tags: any, all, any_strict, all_strict, exact. 'any'/'all' also return untagged pages; the _strict modes and 'exact' do not.")] = None,
         tag_groups: Annotated[Optional[StrictStr], Field(description="JSON-encoded compound tag filter, same shape as recall's `tag_groups`, e.g. `[{\"or\":[{\"tags\":[\"user:kate\"],\"match\":\"all_strict\"},{\"tags\":[\"team\"]}]}]`. Top-level groups are AND-ed, and AND-ed with `tags`.")] = None,
+        with_staleness: Annotated[Optional[StrictBool], Field(description="Compute per-page is_stale flags; disable for metadata-only listings.")] = None,
         authorization: Optional[StrictStr] = None,
         _request_timeout: Union[
             None,
@@ -1266,6 +1267,8 @@ class KnowledgeBaseApi:
         :type tags_match: str
         :param tag_groups: JSON-encoded compound tag filter, same shape as recall's `tag_groups`, e.g. `[{\"or\":[{\"tags\":[\"user:kate\"],\"match\":\"all_strict\"},{\"tags\":[\"team\"]}]}]`. Top-level groups are AND-ed, and AND-ed with `tags`.
         :type tag_groups: str
+        :param with_staleness: Compute per-page is_stale flags; disable for metadata-only listings.
+        :type with_staleness: bool
         :param authorization:
         :type authorization: str
         :param _request_timeout: timeout setting for this request. If one
@@ -1295,6 +1298,7 @@ class KnowledgeBaseApi:
             tags=tags,
             tags_match=tags_match,
             tag_groups=tag_groups,
+            with_staleness=with_staleness,
             authorization=authorization,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -1325,6 +1329,7 @@ class KnowledgeBaseApi:
         tags: Annotated[Optional[List[StrictStr]], Field(description="Only return pages carrying these tags (matched per `tags_match`, like recall).")] = None,
         tags_match: Annotated[Optional[StrictStr], Field(description="How `tags` match a page's tags: any, all, any_strict, all_strict, exact. 'any'/'all' also return untagged pages; the _strict modes and 'exact' do not.")] = None,
         tag_groups: Annotated[Optional[StrictStr], Field(description="JSON-encoded compound tag filter, same shape as recall's `tag_groups`, e.g. `[{\"or\":[{\"tags\":[\"user:kate\"],\"match\":\"all_strict\"},{\"tags\":[\"team\"]}]}]`. Top-level groups are AND-ed, and AND-ed with `tags`.")] = None,
+        with_staleness: Annotated[Optional[StrictBool], Field(description="Compute per-page is_stale flags; disable for metadata-only listings.")] = None,
         authorization: Optional[StrictStr] = None,
         _request_timeout: Union[
             None,
@@ -1351,6 +1356,8 @@ class KnowledgeBaseApi:
         :type tags_match: str
         :param tag_groups: JSON-encoded compound tag filter, same shape as recall's `tag_groups`, e.g. `[{\"or\":[{\"tags\":[\"user:kate\"],\"match\":\"all_strict\"},{\"tags\":[\"team\"]}]}]`. Top-level groups are AND-ed, and AND-ed with `tags`.
         :type tag_groups: str
+        :param with_staleness: Compute per-page is_stale flags; disable for metadata-only listings.
+        :type with_staleness: bool
         :param authorization:
         :type authorization: str
         :param _request_timeout: timeout setting for this request. If one
@@ -1380,6 +1387,7 @@ class KnowledgeBaseApi:
             tags=tags,
             tags_match=tags_match,
             tag_groups=tag_groups,
+            with_staleness=with_staleness,
             authorization=authorization,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -1410,6 +1418,7 @@ class KnowledgeBaseApi:
         tags: Annotated[Optional[List[StrictStr]], Field(description="Only return pages carrying these tags (matched per `tags_match`, like recall).")] = None,
         tags_match: Annotated[Optional[StrictStr], Field(description="How `tags` match a page's tags: any, all, any_strict, all_strict, exact. 'any'/'all' also return untagged pages; the _strict modes and 'exact' do not.")] = None,
         tag_groups: Annotated[Optional[StrictStr], Field(description="JSON-encoded compound tag filter, same shape as recall's `tag_groups`, e.g. `[{\"or\":[{\"tags\":[\"user:kate\"],\"match\":\"all_strict\"},{\"tags\":[\"team\"]}]}]`. Top-level groups are AND-ed, and AND-ed with `tags`.")] = None,
+        with_staleness: Annotated[Optional[StrictBool], Field(description="Compute per-page is_stale flags; disable for metadata-only listings.")] = None,
         authorization: Optional[StrictStr] = None,
         _request_timeout: Union[
             None,
@@ -1436,6 +1445,8 @@ class KnowledgeBaseApi:
         :type tags_match: str
         :param tag_groups: JSON-encoded compound tag filter, same shape as recall's `tag_groups`, e.g. `[{\"or\":[{\"tags\":[\"user:kate\"],\"match\":\"all_strict\"},{\"tags\":[\"team\"]}]}]`. Top-level groups are AND-ed, and AND-ed with `tags`.
         :type tag_groups: str
+        :param with_staleness: Compute per-page is_stale flags; disable for metadata-only listings.
+        :type with_staleness: bool
         :param authorization:
         :type authorization: str
         :param _request_timeout: timeout setting for this request. If one
@@ -1465,6 +1476,7 @@ class KnowledgeBaseApi:
             tags=tags,
             tags_match=tags_match,
             tag_groups=tag_groups,
+            with_staleness=with_staleness,
             authorization=authorization,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -1490,6 +1502,7 @@ class KnowledgeBaseApi:
         tags,
         tags_match,
         tag_groups,
+        with_staleness,
         authorization,
         _request_auth,
         _content_type,
@@ -1527,6 +1540,10 @@ class KnowledgeBaseApi:
         if tag_groups is not None:
             
             _query_params.append(('tag_groups', tag_groups))
+            
+        if with_staleness is not None:
+            
+            _query_params.append(('with_staleness', with_staleness))
             
         # process the header parameters
         if authorization is not None:

@@ -3587,6 +3587,15 @@ def _build_knowledge_tree(nodes: list[dict[str, Any]]) -> list[KnowledgeNode]:
     return roots
 
 
+async def _knowledge_tree_staleness(
+    with_staleness: bool = Query(
+        True, description="Compute per-page is_stale flags; disable for metadata-only listings."
+    ),
+) -> bool:
+    # A dependency keeps existing tag parameters first in generated SDK signatures.
+    return with_staleness
+
+
 def _knowledge_page_response(node: dict[str, Any]) -> KnowledgePageResponse:
     """Project a page node (with merged mental-model content) into a markdown document."""
     page = page_markdown.page_type(node.get("tags"))
@@ -6517,11 +6526,12 @@ def _register_routes(app: FastAPI):
         bank_id: str,
         tag_filter: KnowledgeTagFilter = Depends(_knowledge_tag_filter),
         request_context: RequestContext = Depends(get_request_context),
+        with_staleness: bool = Depends(_knowledge_tree_staleness),
     ):
         """Return the folder/page tree for a bank."""
         try:
             nodes = await app.state.memory.list_knowledge_nodes(
-                bank_id=bank_id, with_staleness=True, tag_filter=tag_filter, request_context=request_context
+                bank_id=bank_id, with_staleness=with_staleness, tag_filter=tag_filter, request_context=request_context
             )
             return KnowledgeTreeResponse(roots=_build_knowledge_tree(nodes))
         except OperationValidationError as e:

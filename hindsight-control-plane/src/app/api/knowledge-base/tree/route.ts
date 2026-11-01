@@ -17,6 +17,8 @@ export async function GET(request: NextRequest) {
     }
     const query = new URLSearchParams();
     appendTagFilter(query, readTagFilter(request.nextUrl.searchParams));
+    const withStaleness = request.nextUrl.searchParams.get("with_staleness");
+    if (withStaleness !== null) query.set("with_staleness", withStaleness);
     const response = await fetch(dataplaneBankUrl(bankId, `/knowledge-base/tree?${query}`), {
       headers: getDataplaneHeaders(),
     });

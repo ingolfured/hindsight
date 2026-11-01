@@ -8824,6 +8824,12 @@ export type GetKnowledgeBaseTreeData = {
      * JSON-encoded compound tag filter, same shape as recall's `tag_groups`, e.g. `[{"or":[{"tags":["user:kate"],"match":"all_strict"},{"tags":["team"]}]}]`. Top-level groups are AND-ed, and AND-ed with `tags`.
      */
     tag_groups?: string | null;
+    /**
+     * With Staleness
+     *
+     * Compute per-page is_stale flags; disable for metadata-only listings.
+     */
+    with_staleness?: boolean;
   };
   url: "/v1/default/banks/{bank_id}/knowledge-base/tree";
 };

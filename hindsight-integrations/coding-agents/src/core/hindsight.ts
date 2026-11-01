@@ -878,11 +878,14 @@ export class HindsightClient {
 
   /**
    * The bank's knowledge-base tree (folders + pages, nested). The tree carries names, source
-   * queries and staleness but NOT synthesized content, so it is cheap enough to poll.
+   * queries and optional staleness but NOT synthesized content.
    */
-  async tree(): Promise<KnowledgeNode[]> {
+  async tree(withStaleness = true): Promise<KnowledgeNode[]> {
     if (this.knowledgePagesSupported === false) throw new KnowledgePagesUnavailableError();
-    const r = await this.req("GET", this.bankUrl("/knowledge-base/tree"));
+    const r = await this.req(
+      "GET",
+      this.bankUrl(`/knowledge-base/tree${withStaleness ? "" : "?with_staleness=false"}`)
+    );
     if (await this.pagesUnsupported(r)) throw new KnowledgePagesUnavailableError();
     // Bank not created yet: it genuinely has no pages, and the capability stays UNKNOWN so the
     // next call (after the first retain mints the bank) asks again instead of short-circuiting.
@@ -920,7 +923,8 @@ export class HindsightClient {
         if (n.children?.length) walk(n.children, n.kind === "folder" ? n.name : folder);
       }
     };
-    walk(await this.tree());
+    // This list drops is_stale, so avoid scanning memories to compute it.
+    walk(await this.tree(false));
     return { items };
   }
 

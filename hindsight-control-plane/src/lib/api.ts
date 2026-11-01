@@ -959,9 +959,9 @@ export class ControlPlaneClient {
   /**
    * Get the knowledge base as a nested folder/page tree.
    */
-  async getKnowledgeTree(bankId: string, filter?: KnowledgeTagFilter) {
+  async getKnowledgeTree(bankId: string, filter?: KnowledgeTagFilter, withStaleness = true) {
     return this.fetchApi<{ roots: KnowledgeNode[] }>(
-      `/api/knowledge-base/tree?bank_id=${encodeURIComponent(bankId)}${knowledgeTagQuery(filter)}`
+      `/api/knowledge-base/tree?bank_id=${encodeURIComponent(bankId)}${knowledgeTagQuery(filter)}&with_staleness=${withStaleness}`
     );
   }
 

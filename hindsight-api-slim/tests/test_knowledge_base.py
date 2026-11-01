@@ -11,12 +11,14 @@ import uuid
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone
 from typing import Any, NoReturn
+from unittest.mock import AsyncMock, MagicMock
 
 import asyncpg
 import pytest
 import pytest_asyncio
 
 import hindsight_api.engine.memory_engine as memory_engine_module
+from hindsight_api.api.http import KnowledgeNode, KnowledgeTreeResponse
 from hindsight_api.engine import page_markdown
 from hindsight_api.engine.db import DatabaseConnection
 from hindsight_api.engine.memory_engine import KnowledgeTagFilter, MemoryEngine, _may_need_refresh
@@ -237,6 +239,28 @@ async def kb_bank(memory: MemoryEngine, request_context):
     )
 
     await memory.delete_bank(bank_id, request_context=request_context)
+
+
+class TestTreeStalenessOption:
+    @pytest.fixture
+    def memory(self):
+        """Reuse api_client without starting PostgreSQL or loading models."""
+        memory = MagicMock(spec=MemoryEngine, audit_logger=None)
+        memory.resolve_bank_alias = AsyncMock(return_value="test-bank")
+        page = KnowledgeNode(id="page", kind="page", name="Orders")
+        memory.list_knowledge_nodes = AsyncMock(return_value=[page.model_dump()])
+        return memory
+
+    async def test_tree_can_skip_staleness(self, api_client, memory):
+        """The HTTP option reaches the engine; existing callers still get checks."""
+        for params, expected in (({}, True), ({"with_staleness": "false"}, False), ({"with_staleness": "true"}, True)):
+            memory.list_knowledge_nodes.reset_mock()
+            resp = await api_client.get("/v1/default/banks/test-bank/knowledge-base/tree", params=params)
+            assert resp.status_code == 200, resp.text
+            tree = KnowledgeTreeResponse.model_validate(resp.json())
+            assert [page.id for page in tree.roots] == ["page"]
+            memory.list_knowledge_nodes.assert_awaited_once()
+            assert memory.list_knowledge_nodes.await_args.kwargs["with_staleness"] is expected
 
 
 class TestTree:

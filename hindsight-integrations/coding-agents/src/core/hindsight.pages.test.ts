@@ -289,14 +289,16 @@ describe("HindsightClient knowledge-page reads", () => {
     expect(c.knowledgePagesSupported).toBe(true);
   });
 
-  it("listPages reads the knowledge-base tree — never /mental-models", async () => {
+  it("listPages reads the knowledge-base tree without unused staleness checks", async () => {
     const calls: any[] = [];
     stubFetch(calls, async () => ({ roots: [] }));
     const c = new HindsightClient({ apiUrl: "http://x", bank: "repo-a" });
     await c.listPages();
     expect(calls).toHaveLength(1);
     expect(calls[0].method).toBe("GET");
-    expect(calls[0].url).toContain("/v1/default/banks/repo-a/knowledge-base/tree");
+    expect(calls[0].url).toBe(
+      "http://x/v1/default/banks/repo-a/knowledge-base/tree?with_staleness=false"
+    );
     expect(calls.some((k) => k.url.includes("/mental-models"))).toBe(false);
   });
 

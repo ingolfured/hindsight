@@ -1858,6 +1858,18 @@ paths:
           nullable: true
           type: string
         style: form
+      - description: Compute per-page is_stale flags; disable for metadata-only listings.
+        explode: true
+        in: query
+        name: with_staleness
+        required: false
+        schema:
+          default: true
+          description: Compute per-page is_stale flags; disable for metadata-only
+            listings.
+          title: With Staleness
+          type: boolean
+        style: form
       - explode: false
         in: header
         name: authorization

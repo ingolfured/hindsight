@@ -2658,6 +2658,18 @@
             "description": "JSON-encoded compound tag filter, same shape as recall's `tag_groups`, e.g. `[{\"or\":[{\"tags\":[\"user:kate\"],\"match\":\"all_strict\"},{\"tags\":[\"team\"]}]}]`. Top-level groups are AND-ed, and AND-ed with `tags`."
           },
           {
+            "name": "with_staleness",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Compute per-page is_stale flags; disable for metadata-only listings.",
+              "default": true,
+              "title": "With Staleness"
+            },
+            "description": "Compute per-page is_stale flags; disable for metadata-only listings."
+          },
+          {
             "name": "authorization",
             "in": "header",
             "required": false,

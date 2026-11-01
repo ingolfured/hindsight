@@ -545,6 +545,7 @@ type ApiGetKnowledgeBaseTreeRequest struct {
 	tags *[]string
 	tagsMatch *string
 	tagGroups *string
+	withStaleness *bool
 	authorization *string
 }
 
@@ -563,6 +564,12 @@ func (r ApiGetKnowledgeBaseTreeRequest) TagsMatch(tagsMatch string) ApiGetKnowle
 // JSON-encoded compound tag filter, same shape as recall&#39;s &#x60;tag_groups&#x60;, e.g. &#x60;[{\&quot;or\&quot;:[{\&quot;tags\&quot;:[\&quot;user:kate\&quot;],\&quot;match\&quot;:\&quot;all_strict\&quot;},{\&quot;tags\&quot;:[\&quot;team\&quot;]}]}]&#x60;. Top-level groups are AND-ed, and AND-ed with &#x60;tags&#x60;.
 func (r ApiGetKnowledgeBaseTreeRequest) TagGroups(tagGroups string) ApiGetKnowledgeBaseTreeRequest {
 	r.tagGroups = &tagGroups
+	return r
+}
+
+// Compute per-page is_stale flags; disable for metadata-only listings.
+func (r ApiGetKnowledgeBaseTreeRequest) WithStaleness(withStaleness bool) ApiGetKnowledgeBaseTreeRequest {
+	r.withStaleness = &withStaleness
 	return r
 }
 
@@ -633,6 +640,12 @@ func (a *KnowledgeBaseAPIService) GetKnowledgeBaseTreeExecute(r ApiGetKnowledgeB
 	}
 	if r.tagGroups != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "tag_groups", r.tagGroups, "form", "")
+	}
+	if r.withStaleness != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "with_staleness", r.withStaleness, "form", "")
+	} else {
+		var defaultValue bool = true
+		r.withStaleness = &defaultValue
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
